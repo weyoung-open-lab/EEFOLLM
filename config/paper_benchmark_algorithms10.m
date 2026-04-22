@@ -5,7 +5,7 @@ function [names, order] = paper_benchmark_algorithms10()
 %
 %   order: plot order (baselines first, ours last for emphasis in figures).
 %
-%   See main_plot_paper_benchmark10.m
+%   See plotting/export_paper_benchmark10_figures.m
 
 names = { ...
     'AOA', 'EO', 'GTO', 'HHO', 'HO', 'MPA', 'SBOA', 'SMA', 'SSA', ...

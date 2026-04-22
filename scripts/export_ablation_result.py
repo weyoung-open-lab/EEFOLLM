@@ -5,7 +5,7 @@
 
 用法（仓库根目录）：  python scripts/export_ablation_result.py
 
-收敛图需 MATLAB：main_plot_ablation_convergence.m（依赖 batch1 与消融的 global_results.mat）
+收敛图：运行 python scripts/plot_ablation_convergence.py（依赖 batch1 与消融的 global_results.mat；需 mat73）
 """
 
 from __future__ import annotations
@@ -320,7 +320,7 @@ def plot_boxplots(rows: list[dict]):
             cols.append(np.array(vals, dtype=float) if vals else np.array([np.nan]))
         fig_w = max(10.0, 0.75 * len(ABL_ALGOS) + 2.0)
         fig, ax = plt.subplots(figsize=(fig_w, 4.8), dpi=120)
-        # 与 plot_boxplots_all_maps.py 一致：离群点为红色加号（非 matplotlib 默认空心圆）
+        # Outliers: red plus markers (not matplotlib default)
         bp = ax.boxplot(
             cols,
             positions=range(1, len(ABL_ALGOS) + 1),
@@ -385,7 +385,7 @@ def main() -> int:
         f"Merged rows: {len(rows)}\n"
         "Figures: boxplots -> figures/boxplots/*.png (300 dpi) + *.svg (vector)\n"
         "Convergence: requires MAT curve data.\n"
-        "  MATLAB: main_plot_ablation_convergence (PNG+SVG)\n"
+        "  Python: scripts/plot_ablation_convergence.py (PNG+SVG)\n"
         "  Or: pip install mat73 && python scripts/plot_ablation_convergence.py\n",
         encoding="utf-8",
     )

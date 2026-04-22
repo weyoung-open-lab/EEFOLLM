@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Export benchmark map figure from maps/Map*.mat without MATLAB.
-Matches plot_paths_all_maps map layer: free=white, obstacle=purple tint; optional start/goal markers.
+Map layer style: free=white, obstacle=purple tint; optional start/goal markers.
 
 Usage (from project root):
   python scripts/export_map_figure.py --map Map3

@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-从 batch1 与消融实验的 global_results.mat 绘制五算法收敛曲线（与 main_plot_ablation_convergence.m 一致）。
+Plot 5-algorithm convergence from batch1 + ablation global_results.mat files.
 
-MATLAB R2006b+ 默认保存多为 v7.3(HDF5)，需: pip install mat73
-若未安装 mat73，请用 MATLAB 运行: main_plot_ablation_convergence
+Requires mat73 for v7.3 MAT: pip install mat73
 
-用法: python scripts/plot_ablation_convergence.py
+Usage: python scripts/plot_ablation_convergence.py
 """
 
 from __future__ import annotations
@@ -231,9 +230,7 @@ Why:
   1) Curve data lives in MATLAB binary files:
        results/global_experiments_batch1/mat/global_results.mat
        results/ablation_eefollm_ablated_only/mat/ablation_eefollm_ablated_only.mat
-  2) Either run MATLAB on the project root:
-       main_plot_ablation_convergence
-     Or install mat73 and run:
+  2) Install mat73 and run:
        pip install mat73
        python scripts/plot_ablation_convergence.py
 
@@ -261,7 +258,7 @@ def main() -> int:
         return 1
     merged = merge(b, a)
     if not merged:
-        print("Merged curves empty — check MAT structure or use MATLAB main_plot_ablation_convergence.", file=sys.stderr)
+        print("Merged curves empty — check MAT structure or fix merge logic in this script.", file=sys.stderr)
         write_readme_missing()
         return 1
     plot_figs(merged)

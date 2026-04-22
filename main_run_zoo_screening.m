@@ -1,8 +1,8 @@
 function main_run_zoo_screening()
 %MAIN_RUN_ZOO_SCREENING Step 2: run all 30 zoo algorithms under unified cfg; rank vs EEFOLLM.
 %
-% Prerequisites: set population/iterations/k/penalties in default_config.m (e.g. after
-% main_tune_llm_sfo_map45). Uses cfg.exp.runs_per_map (20 is heavy; override runs below).
+% Prerequisites: set population/iterations/k/penalties in default_config.m.
+% Uses cfg.exp.runs_per_map (20 is heavy; override runs below).
 %
 % Outputs:
 %   results/zoo_screening/records.csv, zoo_screening.mat

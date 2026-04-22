@@ -6,8 +6,8 @@ function main_run_all()
 %
 %   Optional (set cfg.pipeline.run_optional_studies = true in default_config.m):
 %     2) map overview + method diagrams
-%     3) SFO smoke, algorithm smoke
-%     4) main experiments (8 algorithms), ablation, parameter study, seeds log
+%     3) main experiments, ablation, parameter study, seeds log
+%     (Dedicated smoke / tune drivers are not shipped in the public tree.)
 
 root_dir = fileparts(mfilename('fullpath'));
 addpath(fullfile(root_dir, 'config'));
@@ -35,20 +35,14 @@ try
     generate_method_diagrams(cfg);
     log_message(log_file, 'Method diagrams exported.');
 
-    main_run_sfo_smoke();
-    log_message(log_file, 'Stage2 done: SFO smoke passed.');
-
-    main_run_algorithm_smoke();
-    log_message(log_file, 'Stage3/4 smoke done: EEFOLLM and baselines callable.');
-
     main_run_main_experiments();
-    log_message(log_file, 'Stage5 done: main experiments finished.');
+    log_message(log_file, 'Stage3 done: main experiments finished.');
 
     main_run_ablation();
-    log_message(log_file, 'Stage6 done: ablation finished.');
+    log_message(log_file, 'Stage4 done: ablation finished.');
 
     main_run_param_study();
-    log_message(log_file, 'Stage6 done: parameter study finished.');
+    log_message(log_file, 'Stage5 done: parameter study finished.');
 
     export_seed_log(cfg);
     log_message(log_file, 'Stage7/8 done: analysis outputs and reproducibility logs updated.');

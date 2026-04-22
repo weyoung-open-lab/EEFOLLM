@@ -262,7 +262,7 @@ def main() -> int:
         "Single set per map — no averaging across runs (weights fixed per map for a given generation).\n\n"
         "If Map1/Map2 look uniform (e.g. 0.25 each): check logs — batch1 uses fallback=0 when Python+validation\n"
         "succeed; flat bars then mean validated LLM vectors were near-uniform on easy maps, not\n"
-        "a missing JSON. To resample weights: MATLAB main_regenerate_llm_weights_maps, then re-run this script.\n",
+        "a missing JSON. To resample weights: run scripts/regenerate_weights_batch1.py (or re-run the experiment batch), then re-run this script.\n",
         encoding="utf-8",
     )
     print("Wrote", note)

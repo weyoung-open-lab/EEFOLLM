@@ -26,15 +26,6 @@ $ExcludeRootFiles = @(
     $ZipName
 )
 
-# 不打包的一次性/补跑脚本（相对项目根）
-# 仅剔除作者本地补跑、合并旧结果的入口脚本
-$ExcludeRelFiles = @(
-    "main_rerun_eefollm_map35_merge_batch1.m",
-    "main_rerun_eefollm_map2_merge_batch1.m",
-    "main_rerun_eefollm_maps_merge_batch1.m",
-    "main_rerun_eefollm_map12_merge_batch1.m"
-)
-
 Write-Host "Project root: $ProjectRoot"
 Write-Host "Staging:      $Staging"
 Write-Host "Output zip:   $ZipPath"
@@ -51,14 +42,6 @@ Get-ChildItem -LiteralPath $ProjectRoot -Force | ForEach-Object {
     if ($name -like "sfollm-release-*.zip") { return }
     $dest = Join-Path $Staging $name
     Copy-Item -LiteralPath $_.FullName -Destination $dest -Recurse -Force
-}
-
-foreach ($rel in $ExcludeRelFiles) {
-    $p = Join-Path $Staging $rel
-    if (Test-Path -LiteralPath $p) {
-        Remove-Item -LiteralPath $p -Force
-        Write-Host "Removed from staging: $rel"
-    }
 }
 
 # 不打包 LLM 权重本体（体积过大）：清空 llm\models，仅保留说明文件

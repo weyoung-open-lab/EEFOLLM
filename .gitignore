@@ -1,0 +1,26 @@
+# Python / caches
+.venv/
+.pip_cache/
+.hf_cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# LLM weight files are NOT part of the repository (download separately; see README + llm/models/README.txt)
+llm/models/*
+!llm/models/README.txt
+
+# Staging for local release zips
+_release_staging/
+sfollm-release-*.zip
+
+# Local experiment outputs and ad-hoc archives (not part of source release)
+results/
+logs/
+figures/
+*.zip
+
+# OS / editor
+Thumbs.db
+.DS_Store
+*.asv

@@ -1,0 +1,12 @@
+{
+  "map_name": "Map3",
+  "obstacle_density": 0.186,
+  "free_space_ratio": 0.814,
+  "connected_free_regions": 4,
+  "avg_corridor_width_est": 3.21,
+  "narrow_corridor_ratio": 0.43,
+  "avg_obstacle_block_size": 4.78,
+  "map_scale": 40,
+  "turning_difficulty_score": 0.59,
+  "clutter_score": 0.47
+}

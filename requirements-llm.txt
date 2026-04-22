@@ -1,0 +1,16 @@
+# Python dependencies for EEFOLLM: llm/generate_qwen_weights.py (real Qwen) + MATLAB bridge.
+# Install in a venv, e.g.  python -m venv .venv  then  pip install -r requirements-llm.txt
+# Optional: for CUDA on Windows, install torch from https://pytorch.org/get-started/locally/ first.
+
+transformers==4.46.3
+accelerate
+safetensors
+huggingface_hub
+hf_xet
+tokenizers==0.20.3
+regex
+pyyaml
+numpy
+
+# torch: install separately to match your CUDA/CPU; example (CUDA 12.4 wheels):
+# pip install torch --index-url https://download.pytorch.org/whl/cu124

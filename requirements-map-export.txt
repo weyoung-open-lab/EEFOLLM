@@ -1,0 +1,4 @@
+# 仅用于 scripts/export_map_figure.py（不依赖 MATLAB 导出地图图）
+numpy>=1.20
+scipy>=1.7
+matplotlib>=3.5

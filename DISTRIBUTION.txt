@@ -1,0 +1,30 @@
+EEFOLLM / LLM path planning — distribution package notes
+(Companion file for zips produced by scripts/package_release.ps1)
+
+What the package includes
+  Central experiment config (e.g. default_config.m and related config scripts)
+  Full MATLAB and Python sources; grid maps under maps/ (typically a few hundred KB total)
+  llm/ scripts, prompts, sample I/O; no model weight shards under llm/models/
+  Root-level main_*.m drivers, analysis helpers, and README
+
+Expected zip size
+  A few hundred KB to ~1–2 MB is normal: no multi-GB models, no .venv, no full results tree;
+  text sources compress well. If the archive looks too small, verify config/ and maps/ were not dropped.
+
+Deliberately excluded
+  Weight files and caches under llm/models/ (download per README)
+  Full results/, logs/, figures/ exports, .venv, .hf_cache
+  Some one-off rerun/merge scripts listed in scripts/package_release.ps1
+
+Model weights (if you need real Qwen)
+  See README.md section "LLM: optional download (Qwen)" and llm/models/README.txt.
+  Example (match cfg.llm.local_model_dir in default_config.m):
+    python llm/download_qwen_model.py --repo Qwen/Qwen2.5-3B-Instruct --out llm/models/Qwen2.5-3B-Instruct-full
+  For mock-only runs: set cfg.use_real_qwen = false in default_config.m (no model download).
+
+Python
+  Create a venv and install packages compatible with llm/generate_qwen_weights.py
+  (see requirements-llm.txt in the repository root).
+
+Third-party licenses
+  Qwen, PyTorch, and other libraries keep their own licenses; cite and comply when publishing.

@@ -1,0 +1,13 @@
+{
+  "map_name": "Map2",
+  "obstacle_density": 0.126875,
+  "free_space_ratio": 0.873125,
+  "connected_free_regions": 1,
+  "avg_corridor_width_est": 5.36208,
+  "narrow_corridor_ratio": 0.65926986399427345,
+  "num_obstacle_blocks": 28,
+  "avg_obstacle_block_size": 7.25,
+  "map_scale": 40,
+  "turning_difficulty_score": 0.37000993199713672,
+  "clutter_score": 0.43862500000000004
+}

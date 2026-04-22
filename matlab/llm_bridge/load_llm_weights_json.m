@@ -10,8 +10,8 @@ function [data, err_msg] = load_llm_weights_json(json_path)
 %   See also: generate_llm_weights, validate_llm_weights
 
 if ~exist('load_json', 'file')
-    root = fileparts(fileparts(mfilename('fullpath')));
-    addpath(fullfile(root, 'utils'));
+    root = fileparts(fileparts(fileparts(mfilename('fullpath'))));
+    addpath(fullfile(root, 'matlab', 'utils'));
 end
 
 data = [];

@@ -1,6 +1,7 @@
 function feat = extract_map_features(map_data, out_json_path)
 %EXTRACT_MAP_FEATURES Compute 9 complexity features for LLM input.
-addpath(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'utils'));
+repo = fileparts(fileparts(fileparts(mfilename('fullpath'))));
+addpath(fullfile(repo, 'matlab', 'utils'));
 G = map_data.grid;
 free = (G == 0);
 obs = (G == 1);

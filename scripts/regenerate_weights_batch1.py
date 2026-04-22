@@ -8,7 +8,7 @@ Regenerate results/global_experiments_batch1/weights/weights_Map{1..5}.json usin
   --mode mock   : deterministic rule-based from map features (fast; not neural LLM)
 
 NOTE: Python writes raw Qwen/mock JSON. MATLAB (generate_llm_weights) applies validate_llm_weights.
-Re-run a full batch or call generate_llm_weights per map for identical behavior to main_run_global_experiments_batch.
+Re-run a full batch or call generate_llm_weights per map for identical behavior to run_experiment / run_global_experiments_batch1.
 
 Usage (repo root):
   python scripts/regenerate_weights_batch1.py --mode auto

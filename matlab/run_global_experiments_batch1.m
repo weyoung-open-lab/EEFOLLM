@@ -1,33 +1,20 @@
-function main_run_global_experiments_batch(batch_idx, force_rerun)
-%MAIN_RUN_GLOBAL_EXPERIMENTS_BATCH Formal experiments in three chunks: 10 algorithms each (zoo30 order).
-% Only EEFOLLM uses LLM-derived stage weights; all other algorithms use static cfg.weights.default.
-% Python/LLM runs only in batch(es) where EEFOLLM appears (batch 1 with default zoo order).
+function run_global_experiments_batch1(force_rerun)
+%RUN_GLOBAL_EXPERIMENTS_BATCH1 5 maps x cfg.exp.runs_per_map (default 20) x 10 algorithms (zoo30 slots 1-10, includes EEFOLLM + LLM weights).
+%   Only EEFOLLM uses LLM-derived stage weights; others use cfg.weights.default.
 %
-%   main_run_global_experiments_batch(1)   % algos 1–10 (includes EEFOLLM: generate weights once per map)
-%   main_run_global_experiments_batch(2)   % algos 11–20 — baselines only, no LLM calls
-%   main_run_global_experiments_batch(3)   % algos 21–30 — baselines only, no LLM calls
+%   Outputs: results/global_experiments_batch1/..., figures/global_experiments_batch1/...
+%   Rerun: delete mat/global_results.mat or run run_experiment(true) or set cfg.rerun_global_experiments = true.
 %
-% Outputs:
-%   results/global_experiments_batch{N}/...
-%   figures/global_experiments_batch{N}/...
-%
-% Seeds match a full 30-algorithm run: opts.seed_algo_offset = (batch_idx-1)*10.
-%
-% Rerun: delete results/global_experiments_batch{N}/mat/global_results.mat or pass true as second arg.
+%   See also: run_experiment (repository entry)
 
-if nargin < 1 || isempty(batch_idx)
-    batch_idx = 1;
-end
-if nargin < 2
+if nargin < 1
     force_rerun = false;
 end
-if batch_idx < 1 || batch_idx > 3
-    error('batch_idx must be 1, 2, or 3 (maps to 10 algorithms each).');
-end
+batch_idx = 1;
 
-root_dir = fileparts(mfilename('fullpath'));
-addpath(fullfile(root_dir, 'config'));
-addpath(fullfile(root_dir, 'utils'));
+root_repo = fileparts(fileparts(mfilename('fullpath')));
+addpath(fullfile(root_repo, 'matlab', 'config'));
+addpath(fullfile(root_repo, 'matlab', 'utils'));
 cfg = default_config();
 init_paths(cfg.paths.root);
 ensure_dir(cfg.paths.results);
@@ -69,10 +56,10 @@ if exist(result_mat, 'file') && ~force_rerun && ~cfg.rerun_global_experiments
     fprintf(2, ['\n*** CACHED RESULTS ***\n' ...
         'Loaded: %s\n' ...
         'No new optimization was run. To re-run all algorithms from scratch, use ONE of:\n' ...
-        '  main_run_global_experiments_batch(%d, true)\n' ...
+        '  run_experiment(true)\n' ...
         '  delete(''%s'')\n' ...
-        '  Set cfg.rerun_global_experiments = true in config/default_config.m\n\n'], ...
-        result_mat, batch_idx, result_mat);
+        '  Set cfg.rerun_global_experiments = true in matlab/config/default_config.m\n\n'], ...
+        result_mat, result_mat);
     loaded = load(result_mat, 'out', 'summary_tbl', 'rank_tbl');
     out = loaded.out;
     summary_tbl = loaded.summary_tbl;
@@ -219,32 +206,8 @@ end
 
 fig_llm_w = fullfile(base_fig, 'llm_stage_weights');
 ensure_dir(fig_llm_w);
-cache_root = fullfile(cfg.paths.results, 'global_experiments_batch1', 'weights');
-use_cache = batch_idx > 1;
 
-if use_cache
-    for i = 1:numel(map_list)
-        mname = map_list{i}.name;
-        fjson = fullfile(cache_root, ['weights_', mname, '.json']);
-        if ~isfile(fjson)
-            error('Missing %s — run batch 1 first so EEFOLLM weights exist.', fjson);
-        end
-    end
-    for i = 1:numel(map_list)
-        mname = map_list{i}.name;
-        raw = load_json(fullfile(cache_root, ['weights_', mname, '.json']));
-        [okw, sw, msg] = validate_weights_struct(raw, cfg);
-        if ~okw
-            error('Invalid cached weights for %s: %s', mname, msg);
-        end
-        stage_weights_map.(mname) = sw;
-        save_json(fullfile(wgt_dir, ['weights_', mname, '.json']), sw);
-        log_message(log_file, sprintf('Map=%s weights copied from batch1 cache (EEFOLLM only)', mname));
-    end
-    return;
-end
-
-% batch with EEFOLLM and batch_idx==1: run Python/LLM once per map
+% EEFOLLM in batch 1: run Python/LLM once per map
 for i = 1:numel(map_list)
     map_name = map_list{i}.name;
     [sw, meta] = generate_llm_weights(extract_map_features(map_list{i}, ''), cfg, '');

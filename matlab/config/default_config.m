@@ -17,7 +17,7 @@ cfg.fallback_to_handcrafted = true;
 cfg.use_real_qwen = true;
 
 % Paths
-cfg.paths.root = fileparts(fileparts(mfilename('fullpath')));
+cfg.paths.root = fileparts(fileparts(fileparts(mfilename('fullpath'))));
 cfg.paths.maps = fullfile(cfg.paths.root, 'maps');
 cfg.paths.results = fullfile(cfg.paths.root, 'results');
 cfg.paths.figures = fullfile(cfg.paths.root, 'figures');
@@ -25,7 +25,7 @@ cfg.paths.logs = fullfile(cfg.paths.root, 'logs');
 cfg.paths.llm = fullfile(cfg.paths.root, 'llm');
 cfg.paths.venv_python = fullfile(cfg.paths.root, '.venv', 'Scripts', 'python.exe');
 
-% --- Benchmark maps (single source of truth; run main_regenerate_all_maps after any change) ---
+% --- Benchmark maps (source of truth; committed under maps/; edit + call mapscripts/generate_maps to rebuild) ---
 %   Map   Grid     Density   Role (paper-style description)
 %   Map1  40x40    0.08      Small, sparse
 %   Map2  40x40    0.13      Small, medium clutter
@@ -83,7 +83,7 @@ cfg.pareto = struct('eta_c', 15, 'eta_m', 20);
 
 % OAW (Online Adaptive Weights): see fitness/adapt_stage_weights_online.m, algorithms/run_eefo.m
 % Applied only for EEFOLLM when params.use_online_adaptive_weights is true (see run_experiment_batch).
-% Default false so global batches stay comparable; enable in main_run_llm_eefo_oaw.m
+% Default false so global experiments stay comparable.
 cfg.online_adaptive = struct( ...
     'enable', false, ...
     'every', 5, ...

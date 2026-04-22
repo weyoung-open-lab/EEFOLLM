@@ -1,7 +1,7 @@
 function write_run_status(cfg, msg)
 %WRITE_RUN_STATUS Append timestamped line to logs/run_status.txt for user monitoring.
 if nargin < 1 || isempty(cfg)
-    root = fileparts(fileparts(mfilename('fullpath')));
+    root = fileparts(fileparts(fileparts(mfilename('fullpath'))));
     log_dir = fullfile(root, 'logs');
 else
     log_dir = cfg.paths.logs;

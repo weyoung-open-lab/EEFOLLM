@@ -1,155 +1,63 @@
 # EEFOLLM: LLM-Guided Path Planning on Grid Maps
 
-**EEFOLLM** uses **EEFO** (electric eel foraging–style) search and **LLM-generated stage weights** (early / mid / late) for a four-term path fitness. This repository contains the MATLAB and Python code for the benchmarks, plus fixed grid maps. **Qwen2.5-3B-Instruct** weights are **not** included (download separately; see [LLM: optional download](#llm-optional-download-qwen)).
+EEFOLLM combines **EEFO**-style search with **LLM-generated stage weights** (early / mid / late) for a four-term path fitness. The **MATLAB** implementation lives under [`matlab/`](matlab/); Qwen2.5-3B weights are **not** in Git—see [LLM setup](#llm-optional). **Python** scripts remain in [`llm/`](llm/).
 
-This project is released under the [MIT License](LICENSE). The Qwen model, PyTorch, and other dependencies have their own licenses.
-
----
-
-## Contents
-
-- [Cloning and what is in the repo](#cloning-and-what-is-in-the-repo)
-- [Environment](#environment)
-- [LLM: optional download (Qwen)](#llm-optional-download-qwen)
-- [Quick start (MATLAB)](#quick-start-matlab)
-- [EEFOLLM weight pipeline (overview)](#eefollm-weight-pipeline-overview)
-- [Entry points](#entry-points)
-- [Reproducibility and caches](#reproducibility-and-caches)
-- [Layout](#layout)
-- [Dependencies](#dependencies)
-- [Release zip](#release-zip)
-- [Citing](#citing)
+Released under the [MIT License](LICENSE). Qwen, PyTorch, and other third-party parts keep their own licenses.
 
 ---
 
-## Cloning and what is in the repo
+## How to run the main experiment (5 maps × 20 runs × 10 algorithms)
 
-| Included | Excluded (by design) |
-|----------|----------------------|
-| MATLAB sources, maps, `llm/` scripts and prompts (no model binaries) | `llm/models/*` except [`llm/models/README.txt`](llm/models/README.txt) |
-| Python weight scripts | `.venv/`, `.hf_cache/` |
-| `requirements-llm.txt`, `requirements-map-export.txt` | Qwen weight files, large `results/` / `logs/` (regenerate locally) |
+Repetitions, population size, and iterations are in [`matlab/config/default_config.m`](matlab/config/default_config.m) (`cfg.exp.runs_per_map` default **20**, `cfg.exp.population`, `cfg.exp.iterations`). The 10 algorithms are the first ten entries in `cfg.exp.algorithms_zoo30` (including **EEFOLLM** and nine baselines).
 
----
+1. **MATLAB** — set the *Current Folder* to the **repository root** (the folder that contains `matlab/`, `llm/`, and `maps/`).
+2. **Path** — `addpath('matlab');` then call the single entry (or add `matlab` permanently with `Set Path`).
+3. **Optional: no Qwen download** — in `default_config.m` set `cfg.use_real_qwen = false` to use the mock weight generator.
+4. **Run**
 
-## Environment
+```matlab
+addpath('matlab');
+run_experiment          % or run_experiment(true) to ignore cached mat and recompute
+```
 
-1. **MATLAB** — `cd` to the repository root before running entry scripts.  
-2. **Python (for real Qwen)** — `python -m venv .venv` in the project root. If `.\.venv\Scripts\python.exe` exists, [`config/default_config.m`](config/default_config.m) uses it. Install with `pip install -r requirements-llm.txt` and a **PyTorch** build for your [CPU/CUDA](https://pytorch.org/get-started/locally/).
-
-**Windows helper:** [`setup_venv_e.ps1`](setup_venv_e.ps1) installs a CUDA 12.4 PyTorch build (edit if you need CPU-only).
-
-`generate_qwen_weights.py` sets `HF_HOME` to a project-local `.hf_cache` by default.
+**Outputs (data and figures):**  
+`results/global_experiments_batch1/` — `mat/global_results.mat`, `tables/*.csv`, `features/`, `weights/`, and logs. Figures are written to `figures/global_experiments_batch1/`. If `mat/global_results.mat` already exists, the script reloads it unless you pass `true` or set `cfg.rerun_global_experiments = true`.
 
 ---
 
-## LLM: optional download (Qwen)
+## LLM (optional)
 
-- **Model:** [`Qwen/Qwen2.5-3B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct)  
-- **Optional mirror:** [ModelScope](https://www.modelscope.cn/models/qwen/Qwen2.5-3B-Instruct)  
-- **Default local path in code:** `llm/models/Qwen2.5-3B-Instruct-full` — see `cfg.llm.local_model_dir` in `config/default_config.m`
-
-From the repository root:
+- **Model card:** [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) (optional mirror: [ModelScope](https://www.modelscope.cn/models/qwen/Qwen2.5-3B-Instruct))
+- **Local directory** (see `cfg.llm.local_model_dir` in `default_config.m`):
 
 ```text
 python -m pip install -U huggingface_hub hf_xet
 python llm\download_qwen_model.py --repo Qwen/Qwen2.5-3B-Instruct --out llm\models\Qwen2.5-3B-Instruct-full
 ```
 
-**No download:** set `cfg.use_real_qwen = false` in `config/default_config.m` to use the deterministic mock generator in `llm/mock_llm_weights.py`.
-
-**Note:** per-weight bounds are applied in **Python** (`clip_norm` in `llm/generate_qwen_weights.py`); MATLAB `validate_llm_weights` checks structure, nonnegativity, and per-stage normalization.
-
----
-
-## Quick start (MATLAB)
-
-```matlab
-cd <repository_root>
-main_run_all
-```
-
-With the default `cfg.pipeline.run_optional_studies = false` in `config/default_config.m`, this runs **`main_run_eefollm_quick`** and writes under `results/eefollm_benchmark/`.
-
-**Full 10-algorithm batch (example):**
-
-```matlab
-main_run_global_experiments_batch(1)
-```
-
-**Force a full recompute** if a cached `global_results.mat` would be loaded:
-
-```matlab
-main_run_global_experiments_batch(1, true)
-```
-
-Set `cfg.pipeline.run_optional_studies = true` in `config/default_config.m` to also run the optional branch in `main_run_all` (map overview, method diagrams, main batch, ablation, parameter study, seed log).
+- **Python** — create `.venv` in the repo root; if `.\.venv\Scripts\python.exe` exists, `default_config` uses it. Install `pip install -r requirements-llm.txt` and a suitable **PyTorch** build. See [`setup_venv_e.ps1`](setup_venv_e.ps1) for a CUDA 12.4 example on Windows.
+- Weights are clipped in **Python** (`llm/generate_qwen_weights.py`); MATLAB validates and renormalizes per stage.
 
 ---
 
-## EEFOLLM weight pipeline (overview)
+## Layout (high level)
 
-1. Map features → `extract_map_features.m` → JSON.  
-2. `llm/generate_qwen_weights.py` → JSON with `early` / `mid` / `late` and `wL,wC,wS,wT`.  
-3. `fitness/validate_llm_weights` → validate; on failure, handcrafted `cfg.weights.handcrafted_stage_weights`.  
-4. `run_llm_eefo` / `run_eefo` select the stage from iteration index (default splits in `cfg.stage_split`).
-
----
-
-## Entry points
-
-| Script | Role |
-|--------|------|
-| `main_run_all.m` | One-click: default = `main_run_eefollm_quick`; optional extended pipeline if `run_optional_studies` is true. |
-| `main_run_eefollm_quick.m` | EEFOLLM only → `results/eefollm_benchmark/`. |
-| `main_run_global_experiments_batch(1–3)` | 5 maps × 10 algorithms; batch 1 includes EEFOLLM + `generate_llm_weights`. |
-| `main_run_paper_benchmark10_full.m` | Full 10-benchmark run consistent with the paper table setup. |
-| `main_run_global_experiments.m` | 5×30×N full zoo when needed. |
-| `main_regenerate_all_maps.m` / `main_regenerate_maps45.m` | Rebuild map `.mat` after changing `default_config.m`. |
-| `main_run_ablation*.m` / `main_run_param_study.m` | Ablation and parameter study. |
-| `main_run_zoo_screening.m` | 30-baseline screening under one config. |
-| `plotting/export_paper_benchmark10_figures.m` | Figures for the 9+1 paper slice (needs `results/tables/per_map_all_algorithms_long.csv` first). |
-| `generate_main_tables.m` | Tables from saved results. |
+| Path | Content |
+|------|---------|
+| `matlab/` | All **`.m`** code: `run_experiment.m`, `run_global_experiments_batch1.m`, `config/`, `algorithms/`, `fitness/`, `mapscripts/`, `utils/`, `plotting/`, `analysis/`, `llm_bridge/` |
+| `llm/` | **Python** weight generation, prompts, `io/` (no model weights in Git; see `llm/models/README.txt`) |
+| `maps/` | Fixed benchmark map `.mat` / figures |
+| `results/`, `figures/`, `logs/` | **Not** in Git; created when you run the experiment |
+| `scripts/` | Optional **Python** helpers (ablation export, etc.); not required for `run_experiment` |
 
 ---
 
-## Reproducibility and caches
+## Citing and SFO
 
-- Global seed: `cfg.base_seed` in `config/default_config.m`.  
-- `results/seeds_log.csv` may be written by pipelines that implement it.  
-- If `results/global_experiments_batch1/mat/global_results.mat` exists, batch drivers may **reload** it unless you pass the **force** flag or set `cfg.rerun_global_experiments = true`.
+Cite the Qwen model, baselines you compare, and your own work. `run_sfo.m` is a **paper-inspired** SFO (clarity and fair benchmarking, not a line-by-line match to one reference).
 
 ---
 
-## Layout
+## Package zip
 
-- `config/` — parameters and algorithm lists.  
-- `algorithms/` — SFO, EEFO, EEFOLLM, baselines.  
-- `fitness/` — metrics and `validate_llm_weights`.  
-- `mapscripts/` — map generation and features.  
-- `llm/` — Python bridge and prompts (no weight shards in Git).  
-- `utils/`, `analysis/`, `plotting/`, `scripts/` — helpers and post-processing.  
-
----
-
-## Dependencies
-
-| Component | Notes |
-|-----------|--------|
-| MATLAB | Base install; Image Processing Toolbox optional. |
-| Python | For real Qwen: see `requirements-llm.txt`. |
-| Map export | `requirements-map-export.txt` for `scripts/export_map_figure.py`. |
-
----
-
-## Release zip
-
-[`scripts/package_release.ps1`](scripts/package_release.ps1) builds a source-oriented archive (no model weights, no vendored venv; see also [`DISTRIBUTION.txt`](DISTRIBUTION.txt) and [`llm/models/README.txt`](llm/models/README.txt)).
-
----
-
-## Citing
-
-Cite the Qwen2.5 model card, any baselines you compare, and your own paper when you publish work that uses this code.
-
-`run_sfo.m` is a **paper-inspired** implementation (it favors clarity and fair benchmarking over a byte-for-byte match to one source). With **`run_optional_studies` true**, `main_run_all` runs map overview, diagrams, `main_run_main_experiments`, ablation, and parameter study. Smoke/tune-only drivers are not part of the public file set.
+[`scripts/package_release.ps1`](scripts/package_release.ps1) builds a small archive; see also [`DISTRIBUTION.txt`](DISTRIBUTION.txt).

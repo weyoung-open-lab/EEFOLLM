@@ -1,7 +1,7 @@
 function map_list = generate_maps(cfg)
 %GENERATE_MAPS Build and save five reproducible benchmark maps.
-addpath(fullfile(cfg.paths.root, 'utils'));
-addpath(fullfile(cfg.paths.root, 'plotting'));
+addpath(fullfile(cfg.paths.root, 'matlab', 'utils'));
+addpath(fullfile(cfg.paths.root, 'matlab', 'plotting'));
 ensure_dir(cfg.paths.maps);
 
 map_list = cell(1, numel(cfg.maps.names));

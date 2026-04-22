@@ -71,7 +71,7 @@ if (Test-Path -LiteralPath $DistSrc) {
 
 $bytesStaging = (Get-ChildItem -Path $Staging -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
 Write-Host ("Staging uncompressed: {0:N2} MB (expect ~0.5–3 MB without models/venv/results)" -f ($bytesStaging / 1MB))
-Write-Host "Included: config/, algorithms/, fitness/, maps/, llm/ (no weights), scripts/, *.m at root, etc."
+Write-Host "Included: matlab/, llm/ (no weights), maps/, scripts/, etc."
 
 if (Test-Path -LiteralPath $ZipPath) {
     Remove-Item -LiteralPath $ZipPath -Force

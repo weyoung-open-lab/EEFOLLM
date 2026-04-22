@@ -1,5 +1,5 @@
 function run_global_experiments_batch1(force_rerun)
-%RUN_GLOBAL_EXPERIMENTS_BATCH1 5 maps x cfg.exp.runs_per_map (default 20) x 10 algorithms (zoo30 slots 1-10, includes EEFOLLM + LLM weights).
+%RUN_GLOBAL_EXPERIMENTS_BATCH1 5 maps x cfg.exp.runs_per_map (default 20) x 10 algorithms (cfg.exp.algorithms_batch1; EEFOLLM uses LLM stage weights).
 %   Only EEFOLLM uses LLM-derived stage weights; others use cfg.weights.default.
 %
 %   Outputs: results/global_experiments_batch1/..., figures/global_experiments_batch1/...
@@ -21,14 +21,11 @@ ensure_dir(cfg.paths.results);
 ensure_dir(cfg.paths.figures);
 ensure_dir(cfg.paths.logs);
 
-zo = cfg.exp.algorithms_zoo30;
-if numel(zo) ~= 30
-    error('Expected cfg.exp.algorithms_zoo30 to have 30 entries; got %d.', numel(zo));
+algo_list = cfg.exp.algorithms_batch1;
+if numel(algo_list) ~= 10
+    error('Expected cfg.exp.algorithms_batch1 to have 10 entries; got %d.', numel(algo_list));
 end
-i0 = (batch_idx - 1) * 10 + 1;
-i1 = batch_idx * 10;
-algo_list = zo(i0:i1);
-seed_offset = i0 - 1; % 0, 10, 20
+seed_offset = 0; % only batch shipped: algorithm slot 1..10
 
 suffix = sprintf('batch%d', batch_idx);
 base_res = fullfile(cfg.paths.results, ['global_experiments_', suffix]);
@@ -66,7 +63,7 @@ if exist(result_mat, 'file') && ~force_rerun && ~cfg.rerun_global_experiments
     rank_tbl = loaded.rank_tbl;
 else
     map_list = generate_maps(cfg);
-    stage_weights_map = build_stage_weights_for_batch(cfg, map_list, batch_idx, wgt_dir, log_file, base_fig, algo_list);
+    stage_weights_map = build_stage_weights_for_batch(cfg, map_list, wgt_dir, log_file, base_fig, algo_list);
 
     feat_rows = [];
     for i = 1:numel(map_list)
@@ -193,11 +190,9 @@ fprintf(1, 'Algorithms: %s\n', strjoin(algo_list, ', '));
 fprintf(1, 'Data: %s\n Figures: %s\n', base_res, base_fig);
 end
 
-function stage_weights_map = build_stage_weights_for_batch(cfg, map_list, batch_idx, wgt_dir, log_file, base_fig, algo_list)
+function stage_weights_map = build_stage_weights_for_batch(cfg, map_list, wgt_dir, log_file, base_fig, algo_list)
 % Only EEFOLLM consumes these weights; other algorithms ignore stage_weights_map (static weights).
-needs_llm = any(strcmpi(algo_list, 'EEFOLLM') | strcmpi(algo_list, 'LLM-EEFO') ...
-    | strcmpi(algo_list, 'EEFOLLM-PARTIAL') | strcmpi(algo_list, 'EEFOLLM-NS') ...
-    | strcmpi(algo_list, 'EEFOLLM-NJ'));
+needs_llm = any(strcmpi(algo_list, 'EEFOLLM') | strcmpi(algo_list, 'LLM-EEFO'));
 stage_weights_map = struct();
 if ~needs_llm
     log_message(log_file, 'LLM: skipped — no EEFOLLM in this batch; all runs use static default weights.');

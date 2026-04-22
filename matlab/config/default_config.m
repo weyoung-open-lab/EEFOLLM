@@ -8,9 +8,6 @@ cfg.base_seed = 20260417;
 
 % Rerun controls
 cfg.regenerate_maps = false;
-cfg.rerun_main_experiments = false;
-cfg.rerun_ablation = false;
-cfg.rerun_param_study = false;
 cfg.rerun_global_experiments = false;
 cfg.use_llm_reward = true;
 cfg.fallback_to_handcrafted = true;
@@ -51,13 +48,9 @@ cfg.path.enable_post_smooth = false;
 cfg.exp.population = 30;
 cfg.exp.iterations = 100;
 cfg.exp.runs_per_map = 20;
-cfg.exp.smoke_runs = 3;
-cfg.exp.algorithms = {'EEFOLLM', 'SFO', 'PSO', 'GWO', 'HO', 'EEFO', 'SBOA', 'ARO'};
-% Full zoo list (30) for screening / paper comparison; EEFOLLM uses LLM stage weights; SFO/EEFO/etc. use static default weights.
-cfg.exp.algorithms_zoo30 = { ...
-    'EEFOLLM', 'SFO', 'PSO', 'GWO', 'HO', 'EEFO', 'SBOA', 'ARO', ...
-    'DE', 'WOA', 'ABC', 'SSA', 'FA', 'BA', 'CS', 'GA', 'TLBO', 'SCA', ...
-    'HHO', 'MFO', 'GSA', 'MVO', 'AOA', 'JAYA', 'WCA', 'SMA', 'MPA', 'EO', 'TSA', 'GTO'};
+% Single shipped experiment: 5 maps x runs_per_map x these 10 algorithms (EEFOLLM = LLM stage weights; others = static default).
+cfg.exp.algorithms_batch1 = { ...
+    'EEFOLLM', 'SFO', 'PSO', 'GWO', 'HO', 'EEFO', 'SBOA', 'ARO', 'DE', 'WOA'};
 
 % SFO behavior probabilities
 cfg.sfo.p_fast = 0.35;
@@ -78,9 +71,6 @@ cfg.weights.handcrafted_stage_weights.early = struct('wL', 0.25, 'wC', 0.40, 'wS
 cfg.weights.handcrafted_stage_weights.mid = struct('wL', 0.30, 'wC', 0.30, 'wS', 0.20, 'wT', 0.20);
 cfg.weights.handcrafted_stage_weights.late = struct('wL', 0.30, 'wC', 0.20, 'wS', 0.25, 'wT', 0.25);
 
-% NSGA-II (EEFOLLM-PARETO): SBX / polynomial mutation; p_mut default = min(0.2, 1/dim) in run_pareto_nsga2
-cfg.pareto = struct('eta_c', 15, 'eta_m', 20);
-
 % OAW (Online Adaptive Weights): see fitness/adapt_stage_weights_online.m, algorithms/run_eefo.m
 % Applied only for EEFOLLM when params.use_online_adaptive_weights is true (see run_experiment_batch).
 % Default false so global experiments stay comparable.
@@ -96,9 +86,6 @@ cfg.online_adaptive = struct( ...
 
 % Iteration progress boundaries for early / mid / late (see get_stage_weights)
 cfg.stage_split = struct('early_end', 0.30, 'late_start', 0.70);
-
-% One-click pipeline: skip heavy ablation / param study by default (set true to run all)
-cfg.pipeline = struct('run_optional_studies', false);
 
 % LLM io and mode
 cfg.llm.map_feature_json = fullfile(cfg.paths.llm, 'io', 'map_features_runtime.json');
@@ -126,14 +113,5 @@ cfg.plot.line_width = 1.6;
 cfg.plot.font_name = 'Arial';
 cfg.plot.font_size = 11;
 cfg.plot.dpi = 200;
-
-% Parameter study setup
-cfg.param.pop_sizes = [20, 30, 50];
-cfg.param.iter_counts = [50, 100, 150];
-cfg.param.k_values = [3, 5, 7];
-cfg.param.weight_grid = [...
-    0.25, 0.45, 0.18, 0.12; ...
-    0.35, 0.35, 0.18, 0.12; ...
-    0.45, 0.25, 0.18, 0.12];
 
 end

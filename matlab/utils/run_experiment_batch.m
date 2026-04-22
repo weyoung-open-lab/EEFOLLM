@@ -12,7 +12,7 @@ if ~isfield(opts, 'save_history'), opts.save_history = false; end
 if ~isfield(opts, 'verbose_console'), opts.verbose_console = false; end
 % Optional: seed_algo_offset so batch runs match full-list seeds (global index = offset + ai).
 if ~isfield(opts, 'seed_algo_offset'), opts.seed_algo_offset = 0; end
-% Optional: seed_global_indices — length numel(algo_list), each entry = zoo30 global index (1..30); overrides seed_algo_offset.
+% Optional: seed_global_indices — length numel(algo_list), each entry = global slot index; overrides seed_algo_offset.
 if ~isfield(opts, 'seed_global_indices'), opts.seed_global_indices = []; end
 % Optional: force_map_seed_index — scalar; when map_list has one map, seeds match that map index in cfg.maps.names.
 % Optional: force_map_seed_indices — vector length numel(map_list); per-map index for seed formula (multi-map partial rerun).
@@ -67,25 +67,16 @@ for mi = 1:numel(map_list)
                 params.weights = opts.static_weight_override;
             end
 
-            % Only LLM-SFO / EEFOLLM / EEFOLLM-PARETO use LLM (or default) stage weights; others use static params.weights.
-            if strcmpi(algo, 'LLM-SFO') || strcmpi(algo, 'EEFOLLM') || strcmpi(algo, 'LLM-EEFO') ...
-                    || strcmpi(algo, 'EEFOLLM-PARTIAL') || strcmpi(algo, 'EEFOLLM-NS') ...
-                    || strcmpi(algo, 'EEFOLLM-NJ') ...
-                    || strcmpi(algo, 'EEFOLLM-PARETO') || strcmpi(algo, 'LLM-EEFO-PARETO')
+            % EEFOLLM / LLM-EEFO: LLM (or default) stage weights; others use static params.weights only.
+            if strcmpi(algo, 'EEFOLLM') || strcmpi(algo, 'LLM-EEFO')
                 if isfield(opts.stage_weights_map, map_name)
                     params.stage_weights = opts.stage_weights_map.(map_name);
                 else
                     params.stage_weights = default_stage_weights(cfg);
                 end
                 params.use_stage_weights = true;
-                if strcmpi(algo, 'EEFOLLM') || strcmpi(algo, 'LLM-EEFO') ...
-                        || strcmpi(algo, 'EEFOLLM-PARTIAL') || strcmpi(algo, 'EEFOLLM-NS') ...
-                        || strcmpi(algo, 'EEFOLLM-NJ')
-                    params.use_online_adaptive_weights = isfield(cfg, 'online_adaptive') ...
-                        && cfg.online_adaptive.enable;
-                else
-                    params.use_online_adaptive_weights = false;
-                end
+                params.use_online_adaptive_weights = isfield(cfg, 'online_adaptive') ...
+                    && cfg.online_adaptive.enable;
             else
                 params.use_stage_weights = false;
                 params.use_online_adaptive_weights = false;

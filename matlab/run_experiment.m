@@ -1,5 +1,5 @@
 function run_experiment(force_rerun)
-%RUN_EXPERIMENT  Single entry: 5 maps x cfg.exp.runs_per_map (default 20) x 10 algorithms (EEFOLLM + 9 baselines, zoo order).
+%RUN_EXPERIMENT  Single entry: 5 maps x cfg.exp.runs_per_map (default 20) x 10 algorithms (cfg.exp.algorithms_batch1).
 %   From repository root:  addpath('matlab');  run_experiment
 %   Or:  run('matlab/run_experiment.m')  with Current Folder = repository root
 %
